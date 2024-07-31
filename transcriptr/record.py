@@ -9,7 +9,7 @@ import time
 RESPEAKER_RATE = 16000
 RESPEAKER_CHANNELS = 1
 RESPEAKER_WIDTH = 2
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+MAX_FILE_SIZE = 24 * 1024 * 1024  # 24 MB
 FRAME_DURATION_MS = 30  # Frame duration in milliseconds
 
 class VoiceActivityRecorder:
@@ -64,7 +64,7 @@ class VoiceActivityRecorder:
                 is_speech = self.vad.is_speech(frame, self.sample_rate)
                 time_since_last_speech = int(time.time() - last_speech_time)
                 recording_since = int(time.time() - last_recording_start_time)
-                time_to_log = time.time() - last_log_time >= 10
+                time_to_log = int(time.time() - last_log_time) >= 15
                 if time_to_log:
                     logger.info(f"speech: {is_speech}, recording: {recording} | {time_since_last_speech}s since last speech, {recording_since}s since recording started, {file_size//1024} KB")
                     last_log_time = time.time()
@@ -79,7 +79,7 @@ class VoiceActivityRecorder:
                     file_size += len(frame)
 
                     max_file_size_reached = file_size >= MAX_FILE_SIZE
-                    max_recording_time_reached = (time.time() - last_recording_start_time) >= self.segment_duration
+                    max_recording_time_reached = int(time.time() - last_recording_start_time) >= self.segment_duration
                     if max_file_size_reached or max_recording_time_reached:
                         logger.info("closing file as max file size or max recording time reached")
                         wav_writer.writeframes(b''.join(frames))
@@ -89,12 +89,12 @@ class VoiceActivityRecorder:
                         file_size = 0
 
                     # if no speech was found for 1 minute after the last_speech_time
-                    should_stop_recording = (time.time() - last_speech_time) >= 20
+                    should_stop_recording = (time.time() - last_speech_time) >= 10
                     if should_stop_recording:
                         recording = False
 
         except Exception as e:
-            logger.error(f"Exception occurred: {e}")
+            logger.exception(f"Exception occurred: {e}")
             wav_writer.writeframes(b''.join(frames))
             self.close_recording(wav_writer, output_file)
 
