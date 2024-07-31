@@ -1,0 +1,14 @@
+[Unit]
+Description=Audio Transcription Service
+After=network.target
+
+[Service]
+ExecStart=/home/pi/transcriptr/record.sh -d /mnt/ssd-4tb/audio-recordings/ -t 1800
+WorkingDirectory=/usr/local/bin
+SyslogIdentifier=transcriptr
+Restart=always
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
