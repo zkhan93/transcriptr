@@ -3,7 +3,7 @@ Description=Audio Transcription Service
 After=network.target
 
 [Service]
-ExecStart=/home/pi/transcriptr/record.sh -d /mnt/ssd-4tb/audio-recordings/ -t 1800
+ExecStart=/home/pi/.cache/pypoetry/virtualenvs/transcriptr-2b3aKC51-py3.11/bin/python -m transcriptr.record -d /mnt/ssd-4tb/audio-recordings/ -t 180
 WorkingDirectory=/usr/local/bin
 SyslogIdentifier=transcriptr
 Restart=always
